@@ -7,6 +7,7 @@ from interface import DataManagerInterface as interface
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helper import login_required
+import helper
 import os
 import sys
 from dotenv import load_dotenv
@@ -52,15 +53,20 @@ def register_new_user():
             login = request.form.get('login')
             password = request.form.get('password')
             repeated_psw = request.form.get('repeated_psw')
-        # validate with helper
-            hash = generate_password_hash(password, method="pbkdf2:sha256", salt_length=16)
 
-            new_user = User(name=name,
-                            login=login,
-                            hash=hash
-                            )
-            manager.add_user(new_user)
-        return render_template("login.html")
+            is_valid, message = helper.validate_registration(name, login, manager.get_all_users(), password, repeated_psw)
+            if is_valid:
+                hash = generate_password_hash(password, method="pbkdf2:sha256", salt_length=16)
+
+                new_user = User(name=name,
+                                login=login,
+                                hash=hash
+                                )
+                manager.add_user(new_user)
+                message = ["User successfully registered. Please log in."]
+                return render_template("login.html", messages=message)
+            else:
+                return render_template("register.html", messages=message)
 
     return render_template("register.html")
 
@@ -119,11 +125,8 @@ def add_movie():
 @app.route('/movie/<int:movie_id>', methods=['GET'])
 @login_required
 def movie_details(movie_id):
-        print("function entered")
         movie = db.session.query(Movie).filter(Movie.id==movie_id).first()
-        print("movie gotten")
         user_movie = db.session.query(UserMovies).filter(UserMovies.user_id==session['user_id'], UserMovies.movie_id==movie_id).first()
-        print("got usermovie")
         return render_template('movie.html', movie=movie, user_movie=user_movie)
 
 
@@ -147,6 +150,13 @@ def login_user():
 
     return render_template("login.html")
 
+
+@app.route("/movie/delete/<int:movie_id>", methods=['GET'])
+@login_required
+def delete_movie(movie_id):
+
+    manager.delete_movie(session['user_id'], movie_id)
+    return redirect("/")
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
