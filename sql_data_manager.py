@@ -19,13 +19,14 @@ class SQLiteDataManager(DataManagerInterface):
         return users
 
 
-    def get_user_movies(user_id):
+    def get_user_movies(self, user_id):
         """
         Returns a list of movies of a specific user
         """
-        users_movies = UserMovies.query.filter(user_id=user_id).all()
+    
+        users_movies = self.db.session.query(UserMovies).filter(UserMovies.user_id==user_id).all()
         ids = [UserMovies.movie_id for UserMovies in users_movies]
-        movies = Movie.query.filter(Movie.id.in_(ids)).all()
+        movies = self.db.session.query(Movie).filter(Movie.id.in_(ids)).all()
         return movies
 
 
@@ -46,7 +47,7 @@ class SQLiteDataManager(DataManagerInterface):
         #first checks of movie exists or not
         self.db.session.add(movie)
         self.db.session.commit()
-        return "New movie added"
+        return movie.id
     
 
     def update_user_movie(user_movie):
@@ -64,6 +65,16 @@ class SQLiteDataManager(DataManagerInterface):
 
     def add_user_rating():
         pass
+
+    def add_user_movie(self, user_id, movie_id):
+        new_relationship = UserMovies(user_id=user_id,
+                                      movie_id=movie_id,
+                                      user_rating= None,
+                                      user_review= None)
+        
+        self.db.session.add(new_relationship)
+        self.db.session.commit()
+
 
     def delete_movie(self, user_id, movie_id):
         """

@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+    <form action="/register" method="post">
+        <label for="user_name">Full name:</label>
+        <input name="user_name" type="text" placeholder="John Smith">
+        <label>Login:</label>
+        <input name="login" type="text" placeholder="John123">
+        <label>Passwords:</label>
+        <input name="password" type="text">
+        <label>Repeat the password:</label>
+        <input name="repeated_psw" type="text">
+        <button type="submit" name="add" value="add_user">register me</button>
+    </form>
+{% endblock %}

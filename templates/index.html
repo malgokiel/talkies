@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+    <h2>The Talkies</h2>
+    <form action="/" method="post">
+        <input name="title" placeholder="title">
+        <button name="add_movie" value="add">add new movie</button>
+    </form>
+    <div>
+        <ol>
+            {% for movie in movies %}
+            <li>
+                <a href="/movie/{{ movie.id }}"><img src="{{ movie.poster_url }}""></a>
+                <p>{{ movie.title }}</p>
+                <p>{{ movie.rating }}</p>
+                <p>{{ movie.year }}</p>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+{% endblock %}

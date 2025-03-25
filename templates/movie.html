@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+    <h2>TITLE</h2>
+    <div class="container">
+        <div class="poster and info">
+            <a><img src="{{ movie.poster_url }}"></a>
+            <p>{{ movie.title }}</p>
+            <p>{{ movie.rating }}</p>
+            <p>{{ movie.year }}</p>
+        </div>
+        <div class="actions">
+            <a href="https://www.imdb.com/title/{{ movie.imdb_id }}/">imDB</a>
+            <button>delete movie</button>
+            <p>{{ user_movie.rating }}</p><button>change</button>
+            <p>{{ user_movie.review }}</p><button>update</button>
+        </div>
+    </div>
+{% endblock %}

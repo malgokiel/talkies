@@ -24,6 +24,8 @@ class Movie(db.Model):
     director = db.Column(db.String)
     year = db.Column(db.Integer)
     rating = db.Column(db.Float)
+    poster_url = db.Column(db.String)
+    imdb_id = db.Column(db.String)
 
     def __repr__(self):
         return f'"{self.title} ({self.year}) directed by {self.director}. Rating: {self.rating}"'

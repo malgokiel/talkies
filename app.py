@@ -7,12 +7,21 @@ from interface import DataManagerInterface as interface
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helper import login_required
+import os
+import sys
+from dotenv import load_dotenv
+import requests
+
+load_dotenv()
+API_KEY = os.getenv('API_KEY')
+
 # Set the app up and establish db connection
 
 current_directory = os.getcwd()
 database_path = os.path.join(current_directory, 'data', 'talkies.sqlite')
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:////{database_path}'
+
 db = SQLAlchemy(app)
 manager = SQLiteDataManager(db)
 
@@ -56,10 +65,66 @@ def register_new_user():
     return render_template("register.html")
 
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    return render_template('index.html')
+    if request.method == 'POST':
+        action = request.form.get('add_movie')
+        if action == 'add':
+            title_to_search = request.form.get('title')
+            api_url = f'http://www.omdbapi.com/?apikey={API_KEY}&t={title_to_search}'
+
+            try:
+                response = requests.get(api_url)
+                if response.status_code == 200:
+                    title_data_json = response.json()
+                else:
+                    print(f"Error occurred: {response.status_code}")
+                    sys.exit()
+            except requests.exceptions.ConnectionError:
+                print(
+                    "We were not able to connect to www.omdbapi.com. "
+                    "Please check your Internet connection or try again later.")
+                sys.exit()
+            
+            if title_data_json["Response"] == 'True' and title_data_json["Type"] != "series":
+                title = title_data_json["Title"]
+                director = title_data_json["Director"]
+                year = title_data_json["Year"]
+                rating = title_data_json["imdbRating"]
+                poster_url = title_data_json["Poster"]
+                imdb_id = title_data_json["imdbID"]
+
+                new_movie = Movie(title=title,
+                                director=director,
+                                year=year,
+                                rating=rating,
+                                poster_url=poster_url,
+                                imdb_id=imdb_id)
+                movie_id = manager.add_movie(new_movie)
+
+                manager.add_user_movie(session["user_id"], movie_id)
+
+    movies = manager.get_user_movies(session["user_id"])
+    print(movies)
+    return render_template('index.html', movies=movies)
+
+
+@app.route('/add_movie', methods=['GET', 'POST'])
+@login_required
+def add_movie():
+        pass
+
+
+@app.route('/movie/<int:movie_id>', methods=['GET'])
+@login_required
+def movie_details(movie_id):
+        print("function entered")
+        movie = db.session.query(Movie).filter(Movie.id==movie_id).first()
+        print("movie gotten")
+        user_movie = db.session.query(UserMovies).filter(UserMovies.user_id==session['user_id'], UserMovies.movie_id==movie_id).first()
+        print("got usermovie")
+        return render_template('movie.html', movie=movie, user_movie=user_movie)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -105,4 +170,4 @@ if __name__ == "__main__":
 
 
 # with app.app_context():
-#    db.create_all()
+#     db.create_all()

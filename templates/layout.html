@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talkies</title>
+</head>
+<body>
+    <nav>
+        {% if session["user_id"] %}
+        <a href="/movies">My talkies</a>
+        <a href="/add_movie">Add talkie</a>
+        <a href="/delete_movie">Delete talkie</a>
+        {% else %}
+        <a href="/login">Log In</a>
+        <a href="/register">Create an account</a>
+        {% endif %}
+    </nav>
+    <main>
+        {% block main %}{% endblock %}
+    </main>
+</body>
+</html>
