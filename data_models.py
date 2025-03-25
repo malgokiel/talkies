@@ -12,7 +12,7 @@ class User(db.Model):
     hash = db.Column(db.String)
 
     def __repr__(self):
-        return f'Username: {self.name}, user id: {self.id}'
+        return f'username: {self.name}, user_id: {self.id}, hash: {self.hash}'
     
 
 class Movie(db.Model):
