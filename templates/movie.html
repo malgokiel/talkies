@@ -6,15 +6,16 @@
         <div class="poster and info">
             <a><img src="{{ movie.poster_url }}"></a>
             <p>{{ movie.title }}</p>
-            <p>{{ movie.rating }}</p>
+            <p>{{ movie.rating }}/10</p>
+            <p>Directed by: {{ movie.director }}</p>
             <p>{{ movie.year }}</p>
             <a href="https://www.imdb.com/title/{{ movie.imdb_id }}/">imDB</a>
             <button name="delete" value="{{ movie.id }}" type="submit" onclick=deleteMovie(value)>delete movie</button>
         </div>
-        <div id="review-container" data-book-id="{{ movie.id }}">
+        <div id="review-container" data-movie-id="{{ movie.id }}">
             <h3>Your Rating:</h3>
             <div class="editable-field" id="rating-section">
-              <span id="current-rating">{{ user_movie.rating }}/10</span>
+              <span id="current-rating">{{ user_movie.user_rating }}/10</span>
               <button class="edit-button" data-target="rating">Edit</button>
               <div class="edit-controls" id="edit-rating-controls" style="display: none;">
                 <input type="number" id="edit-rating-input" value="">
@@ -25,7 +26,7 @@
           
             <h3>Your Review:</h3>
             <div class="editable-field" id="review-section">
-              <p id="current-review">{{ user_movie.review }}</p>
+              <p id="current-review">{{ user_movie.user_review }}</p>
               <button class="edit-button" data-target="review">Edit</button>
               <div class="edit-controls" id="edit-review-controls" style="display: none;">
                 <textarea id="edit-review-textarea"></textarea>
@@ -67,7 +68,7 @@
 
             // User clicked 'save' botton and now:
             document.addEventListener('click', (event) => {
-                if (event.target.classList.contains("edit-button")) {
+                if (event.target.classList.contains("save-button")) {
                     const target = event.target.dataset.target;
                     const section = document.getElementById(`${target}-section`);
                     const displayElement = section.querySelector(target == "rating"? "#current-rating" : "#current-review");
@@ -94,7 +95,7 @@
                         return response.json()
                     })
                     .then(data => {
-                        console.log("Backen response:", data);
+                        console.log("Backed response:", data);
                     })
                     .catch(error => {
                         console.error(`Error sending update request for ${target}:`, error);

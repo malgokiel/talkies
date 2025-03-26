@@ -53,3 +53,10 @@ def validate_registration(name, login, users, password, repeated_psw):
         return False, messages
 
 
+def is_new_movie(movie_imdb, movies):
+    movie_imdb_ids = [movie.imdb_id for movie in movies]
+    if movie_imdb in movie_imdb_ids:
+        return False
+    else:
+        return True
+

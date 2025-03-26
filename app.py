@@ -12,10 +12,12 @@ import os
 import sys
 from dotenv import load_dotenv
 import requests
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 load_dotenv()
 API_KEY = os.getenv('API_KEY')
-
+ 
 # Set the app up and establish db connection
 
 current_directory = os.getcwd()
@@ -74,8 +76,11 @@ def register_new_user():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    
     if request.method == 'POST':
+        all_movies = manager.get_all_movies()
         action = request.form.get('add_movie')
+        search = request.form.get('search')
         if action == 'add':
             title_to_search = request.form.get('title')
             api_url = f'http://www.omdbapi.com/?apikey={API_KEY}&t={title_to_search}'
@@ -101,19 +106,32 @@ def index():
                 poster_url = title_data_json["Poster"]
                 imdb_id = title_data_json["imdbID"]
 
-                new_movie = Movie(title=title,
-                                director=director,
-                                year=year,
-                                rating=rating,
-                                poster_url=poster_url,
-                                imdb_id=imdb_id)
-                movie_id = manager.add_movie(new_movie)
-
-                manager.add_user_movie(session["user_id"], movie_id)
-
-    movies = manager.get_user_movies(session["user_id"])
-    print(movies)
-    return render_template('index.html', movies=movies)
+                if helper.is_new_movie(imdb_id, all_movies):
+                    new_movie = Movie(title=title,
+                                    director=director,
+                                    year=year,
+                                    rating=rating,
+                                    poster_url=poster_url,
+                                    imdb_id=imdb_id)
+                    movie_id = manager.add_movie(new_movie)
+                else:
+                    movie = db.session.query(Movie).filter(Movie.imdb_id==imdb_id).first()
+                    movie_id = movie.id
+                try:
+                    manager.add_user_movie(session["user_id"], movie_id)
+                except IntegrityError:  
+                    db.session.rollback()
+                    user_movies = manager.get_user_movies(session["user_id"])
+                    return render_template('index.html', movies=user_movies, messages="You already have this movie in your list")
+        if search:
+            print(search)
+            matching_movies = manager.get_matching_movies(search, session["user_id"])
+            if matching_movies:
+                return render_template('index.html', movies=matching_movies)
+            else:
+                return render_template("index.html", movies=[], message="Oops, no matches found")
+    user_movies = manager.get_user_movies(session["user_id"])
+    return render_template('index.html', movies=user_movies)
 
 
 @app.route('/add_movie', methods=['GET', 'POST'])
@@ -161,12 +179,13 @@ def login_user():
             user_login = request.form.get('login_id')
             password = request.form.get('password')
             matching_user = db.session.query(User).filter(User.login==user_login).all()
-            user_hash = [user.hash for user in matching_user]
-            user_id = [user.id for user in matching_user]
-            if check_password_hash(user_hash[0], password):
-                session['user_id'] = user_id[0]
-                session['username'] = user_login
-                return redirect('/')
+            if matching_user:
+                user_hash = [user.hash for user in matching_user]
+                user_id = [user.id for user in matching_user]
+                if check_password_hash(user_hash[0], password):
+                    session['user_id'] = user_id[0]
+                    session['username'] = user_login
+                    return redirect('/')
             else:
                 return render_template("login.html", message="Incorrect user or password")
 
@@ -176,9 +195,12 @@ def login_user():
 @app.route("/movie/delete/<int:movie_id>", methods=['GET'])
 @login_required
 def delete_movie(movie_id):
-
-    manager.delete_movie(session['user_id'], movie_id)
+    try:
+        manager.delete_movie(session['user_id'], movie_id)
+    except UnmappedInstanceError:
+        print("Someobody just manually changed movie ID in HTML to a non existing user_movie relationship.")
     return redirect("/")
+
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():

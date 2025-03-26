@@ -1,6 +1,11 @@
 {% extends 'layout.html' %}
 
 {% block main %}
+{% if messages %}
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+{% endif %}
     <form action="/register" method="post">
         <label for="user_name">Full name:</label>
         <input name="user_name" type="text" placeholder="John Smith">

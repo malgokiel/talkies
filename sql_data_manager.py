@@ -18,6 +18,15 @@ class SQLiteDataManager(DataManagerInterface):
         users = self.db.session.query(User).all()
         return users
 
+    def get_all_movies(self):
+        movies = self.db.session.query(Movie).all()
+        return movies
+
+    def get_matching_movies(self, find_match, user_id):
+        #movies = self.db.session.query(Movie).filter(or_(Movie.title.like(f"%{find_match}"), Movie.director.like(f"%{find_match}")))
+        user_movies = self.get_user_movies(user_id)
+        matching_movies = [user_movie for user_movie in user_movies if find_match.casefold() in user_movie.title or find_match.casefold() in user_movie.director]
+        return matching_movies
 
     def get_user_movies(self, user_id):
         """
