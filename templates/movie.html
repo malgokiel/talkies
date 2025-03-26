@@ -8,12 +8,112 @@
             <p>{{ movie.title }}</p>
             <p>{{ movie.rating }}</p>
             <p>{{ movie.year }}</p>
-        </div>
-        <div class="actions">
             <a href="https://www.imdb.com/title/{{ movie.imdb_id }}/">imDB</a>
-            <button>delete movie</button>
-            <p>{{ user_movie.rating }}</p><button>change</button>
-            <p>{{ user_movie.review }}</p><button>update</button>
+            <button name="delete" value="{{ movie.id }}" type="submit" onclick=deleteMovie(value)>delete movie</button>
         </div>
-    </div>
+        <div id="review-container" data-book-id="{{ movie.id }}">
+            <h3>Your Rating:</h3>
+            <div class="editable-field" id="rating-section">
+              <span id="current-rating">{{ user_movie.rating }}/10</span>
+              <button class="edit-button" data-target="rating">Edit</button>
+              <div class="edit-controls" id="edit-rating-controls" style="display: none;">
+                <input type="number" id="edit-rating-input" value="">
+                <button class="save-button" data-target="rating">Save</button>
+                <button class="cancel-button" data-target="rating">Cancel</button>
+              </div>
+            </div>
+          
+            <h3>Your Review:</h3>
+            <div class="editable-field" id="review-section">
+              <p id="current-review">{{ user_movie.review }}</p>
+              <button class="edit-button" data-target="review">Edit</button>
+              <div class="edit-controls" id="edit-review-controls" style="display: none;">
+                <textarea id="edit-review-textarea"></textarea>
+                <button class="save-button" data-target="review">Save</button>
+                <button class="cancel-button" data-target="review">Cancel</button>
+              </div>
+            </div>
+          </div>
+    <script>
+        console.log("executing");
+        document.addEventListener('DOMContentLoaded', () => {
+            // Getting all the elements from HTML
+            const reviewContainer = document.getElementById("review-container");
+            const currentRating = document.getElementById("current-rating");
+            const currentReview = document.getElementById("current-review");
+            const editButton = document.getElementById("edit-button");
+            const saveButton = document.getElementById("save-button");
+            const editFields = document.getElementById("edit-fields");
+            const editRatingInput = document.getElementById("edit-rating-input");
+            const editReviewTextarea = document.getElementById("edit-review-textarea");
+            const movieId = reviewContainer.dataset.movieId;
+
+            // User clicked 'edit' button and now:
+            document.addEventListener('click', (event) => {
+                if (event.target.classList.contains("edit-button")) {
+                    const target = event.target.dataset.target;
+                    const section = document.getElementById(`${target}-section`);
+                    const displayElement = section.querySelector(target == "rating"? "#current-rating" : "#current-review");
+                    const editControls = document.getElementById(`edit-${target}-controls`);
+                    const inputElement = section.querySelector(target === "rating" ? "#edit-rating-input" : "#edit-review-textarea");
+                    inputElement.value = displayElement.textContent.replace("stars", "");
+                    displayElement.style.display = "none";
+                    event.target.style.display = "none";
+                    editControls.style.display = "block";
+
+                }
+
+            });
+
+            // User clicked 'save' botton and now:
+            document.addEventListener('click', (event) => {
+                if (event.target.classList.contains("edit-button")) {
+                    const target = event.target.dataset.target;
+                    const section = document.getElementById(`${target}-section`);
+                    const displayElement = section.querySelector(target == "rating"? "#current-rating" : "#current-review");
+                    const editControls = document.getElementById(`edit-${target}-controls`);
+                    const inputElement = section.querySelector(target === "rating" ? "#edit-rating-input" : "#edit-review-textarea");
+                    const newValue = inputElement.value;
+                    const endpoint = target === "rating" ? '/update_rating' : '/update_review';
+                    const dataToSend = { movie_id: movieId, [target]: newValue };
+
+                    fetch(endpoint, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(dataToSend)
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            displayElement.textContent = target === 'rating' ? `${newValue} /10` : newValue;
+                            displayElement.style.display = "block";
+                            editControls.style.display = "none";
+                            section.querySelector(".edit-button").style.display = "inline-block";
+                        } else {
+                            console.error(`Failed to update ${target}:`, response.status);
+                        }
+                        return response.json()
+                    })
+                    .then(data => {
+                        console.log("Backen response:", data);
+                    })
+                    .catch(error => {
+                        console.error(`Error sending update request for ${target}:`, error);
+                    });
+                }  
+            });
+            // Possible extension like 'cancel' button:
+            document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('cancel-button')) {
+                const target = event.target.dataset.target;
+                const section = document.getElementById(`${target}-section`);
+                const displayElement = section.querySelector(target === 'rating' ? '#current-rating' : '#current-review');
+                const editControls = document.getElementById(`edit-${target}-controls`);
+
+                displayElement.style.display = 'block';
+                editControls.style.display = 'none';
+                section.querySelector('.edit-button').style.display = 'inline-block';
+            }
+            });
+        })
+    </script>
 {% endblock %}
