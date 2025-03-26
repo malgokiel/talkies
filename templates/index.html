@@ -1,27 +1,25 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-{% if message %}
+    <h1>The Talkies</h1>
+    {% if message %}
     <p>{{ message }}</p>
-{% endif %}
-    <h2>The Talkies</h2>
-    <form action="/" method="post">
-        <input name="title" placeholder="title">
-        <button name="add_movie" value="add">add new movie</button>
-        <div class="search-container">
-            <input type="text" name="search" placeholder="Search...">
+    {% endif %}
+    <form action="/" method="post" class="index-form">
+        <div>
+            <input name="title" placeholder="title">
+            <button name="add_movie" value="add">add new movie</button>
+        </div>
+        <div>
+            <input type="text" name="search" placeholder="search...">
             <button name="search" type="submit"><i class="fa fa-search"></i></button>
         </div>
     </form>
     <div>
-        <ol>
+        <ol class="movie-grid">
             {% for movie in movies %}
             <li>
-                <a href="/movie/{{ movie.id }}"><img src="{{ movie.poster_url }}""></a>
-                <p>{{ movie.title }}</p>
-                <p>{{ movie.rating }}/10</p>
-                <p>directed by: {{ movie.director }}</p>
-                <p>{{ movie.year }}</p>
+                <a href="/movie/{{ movie.id }}"><img src="{{ movie.poster_url }}" class="movie-poster"></a>
             </li>
             {% endfor %}
         </ol>

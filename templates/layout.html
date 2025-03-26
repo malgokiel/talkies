@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Talkies</title>
+    <link href="/static/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    <nav>
+    <nav class="topnav">
         {% if session["user_id"] %}
         <a href="/">My talkies</a>
-        <a href="/add_movie">Add talkie</a>
-        <a href="/delete_movie">Delete talkie</a>
-        <p>Logged as: {{ session["username"] }}</p>
-        <a href="/logout">Log me out</a>
+        <a class="right-menu" href="/logout">Log me out</a>
+        <p class="right-menu">Logged as: {{ session["username"] }}</p>  
         {% else %}
-        <a href="/login">Log In</a>
-        <a href="/register">Create an account</a>
+        <a class="right-menu" href="/login">Log In</a>
+        <a class="right-menu" href="/register">Create an account</a>
         {% endif %}
     </nav>
     <main>
