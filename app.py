@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, session, request, render_template, redirect
+from flask import Flask, session, request, render_template, redirect, jsonify
 import os
 from data_models import db, User, Movie, UserMovies
 from sql_data_manager import SQLiteDataManager
@@ -130,6 +130,28 @@ def movie_details(movie_id):
         return render_template('movie.html', movie=movie, user_movie=user_movie)
 
 
+@app.route('/update_rating', methods=['POST'])
+@login_required
+def user_rating():
+    data = request.get_json()
+    movie_id = data.get('movie_id')
+    rating = data.get('rating')
+    print(f"Received rating update for movie ID: {movie_id}, New Rating: {rating}")
+    manager.manage_user_rating(session["user_id"], movie_id, rating)
+    return jsonify({'message': 'Rating updated successfully'}), 200
+
+
+@app.route('/update_review', methods=['POST'])
+@login_required
+def user_review():
+    data = request.get_json()
+    movie_id = data.get('movie_id')
+    review = data.get('review')
+    print(f"Received review update for movie ID: {movie_id}, New Review: {review}")
+    manager.manage_user_review(session["user_id"], movie_id, review)
+    return jsonify({'message': 'Rating updated successfully'}), 200
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login_user():
     session.clear()
@@ -146,7 +168,7 @@ def login_user():
                 session['username'] = user_login
                 return redirect('/')
             else:
-                print("here")
+                return render_template("login.html", message="Incorrect user or password")
 
     return render_template("login.html")
 

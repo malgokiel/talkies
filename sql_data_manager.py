@@ -11,11 +11,11 @@ class SQLiteDataManager(DataManagerInterface):
     def __init__(self, db):
         self.db = db
 
-    def get_all_users():
+    def get_all_users(self):
         """
         Returns a list of all users from a DB
         """
-        users = User.query.all()
+        users = self.db.session.query(User).all()
         return users
 
 
@@ -50,21 +50,16 @@ class SQLiteDataManager(DataManagerInterface):
         return movie.id
     
 
-    def update_user_movie(user_movie):
-        """
-        Updates details of the specific movie in the DB
-        """
-        #we don't update a movie because we get everything from IDBN
-        #we are updating user-Movies
+    def manage_user_review(self,user_id, movie_id, review):
+        user_movie = self.db.session.query(UserMovies).filter(UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
+        user_movie.user_review = review
+        self.db.session.commit()
 
-        # also needed: add_user_review(), add_user_rating()
-        pass
 
-    def add_user_review():
-        pass
-
-    def add_user_rating():
-        pass
+    def manage_user_rating(self,user_id, movie_id, rating):
+        user_movie = self.db.session.query(UserMovies).filter(UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
+        user_movie.user_rating = rating
+        self.db.session.commit()
 
     def add_user_movie(self, user_id, movie_id):
         new_relationship = UserMovies(user_id=user_id,
@@ -82,8 +77,8 @@ class SQLiteDataManager(DataManagerInterface):
         """
         #needs refactoring - we are not going to delete a movie from movies, 
         #we are going to delete a relationship movie-user from user_movies
-        movie_to_delete = self.db.session.get(Movie, movie_id)
-        self.db.session.delete(movie_to_delete)
+        user_movie = self.db.session.query(UserMovies).filter(UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
+        self.db.session.delete(user_movie)
         self.db.session.commit()
         return "Movie deleted"
 
