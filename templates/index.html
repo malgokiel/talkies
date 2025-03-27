@@ -2,9 +2,6 @@
 
 {% block main %}
     <h1>The Talkies</h1>
-    {% if message %}
-    <p>{{ message }}</p>
-    {% endif %}
     <form action="/" method="post" class="index-form">
         <div>
             <input name="title" placeholder="title">
@@ -12,7 +9,7 @@
         </div>
         <div>
             <input type="text" name="search" placeholder="search...">
-            <button name="search" type="submit"><i class="fa fa-search"></i></button>
+            <button name="search" type="submit" class="loop"><i class="fa fa-search"></i></button>
         </div>
     </form>
     <div>

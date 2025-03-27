@@ -1,19 +1,19 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-    <h2>TITLE</h2>
+<main class="movie-form-page">
     <div class="container">
-        <div class="poster and info">
-            <a><img src="{{ movie.poster_url }}"></a>
-            <p>{{ movie.title }}</p>
-            <p>{{ movie.rating }}/10</p>
+        <div class="slide" id="poster-container">
+            <a><img src="{{ movie.poster_url }}" class="movie-poster poster"></a>
+            <h2>{{ movie.title }}</h2>
+            <p>{{ movie.rating }}/10 &#11088;</p>
             <p>Directed by: {{ movie.director }}</p>
             <p>{{ movie.year }}</p>
-            <a href="https://www.imdb.com/title/{{ movie.imdb_id }}/">imDB</a>
+            <a href="https://www.imdb.com/title/{{ movie.imdb_id }}/">imDB page</a>
             <button name="delete" value="{{ movie.id }}" type="submit" onclick=deleteMovie(value)>delete movie</button>
         </div>
-        <div id="review-container" data-movie-id="{{ movie.id }}">
-            <h3>Your Rating:</h3>
+        <div class="slide" id="review-container" data-movie-id="{{ movie.id }}">
+            <h3>My Rating:</h3>
             <div class="editable-field" id="rating-section">
               <span id="current-rating">{{ user_movie.user_rating }}/10</span>
               <button class="edit-button" data-target="rating">Edit</button>
@@ -24,9 +24,10 @@
               </div>
             </div>
           
-            <h3>Your Review:</h3>
+            <h3>My Review:</h3>
             <div class="editable-field" id="review-section">
               <p id="current-review">{{ user_movie.user_review }}</p>
+              <span class="tooltip">{{ user_movie.user_review }}</span>
               <button class="edit-button" data-target="review">Edit</button>
               <div class="edit-controls" id="edit-review-controls" style="display: none;">
                 <textarea id="edit-review-textarea"></textarea>
@@ -117,4 +118,5 @@
             });
         })
     </script>
+</main>
 {% endblock %}

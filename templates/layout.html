@@ -18,6 +18,13 @@
         <a class="right-menu" href="/register">Create an account</a>
         {% endif %}
     </nav>
+    <div class="message-display">
+        {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+    </div>
     <main>
         {% block main %}{% endblock %}
     </main>

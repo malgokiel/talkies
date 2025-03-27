@@ -1,11 +1,8 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-{% if messages %}
-    {% for message in messages %}
-    <p>{{ message }}</p>
-    {% endfor %}
-{% endif %}
+<main >
+<div class="log-register-user">
     <form action="/register" method="post">
         <label for="user_name">Full name:</label>
         <input name="user_name" type="text" placeholder="John Smith">
@@ -17,4 +14,7 @@
         <input name="repeated_psw" type="text">
         <button type="submit" name="add" value="add_user">register me</button>
     </form>
+</div>
+</main>
+
 {% endblock %}

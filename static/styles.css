@@ -7,6 +7,14 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%2398ac92' fill-opacity='0.22'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 
+.message-display {
+    width: 100%;
+    font-size: 2.5vh;
+    display: flex;
+    justify-content: center;
+    font-style: italic;
+    padding: 10px;
+}
 
 /* Navigation bar styling */
 .topnav {
@@ -18,7 +26,7 @@ body {
 
 .topnav a {
     float: left;
-    color: #e8eae2;;
+    color: #e8eae2;
     text-align: center;
     padding: 10px 13px;
     text-decoration: none;
@@ -40,6 +48,48 @@ body {
 
 .topnav .right-menu {
     float: right;
+}
+
+
+.log-register-user {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    width: 100%;
+}
+
+label {
+    font-size: 10px;
+    margin: 5px;
+    display: block;
+    width: 100%;
+}
+
+.log-register-user button {
+    display: block;
+    margin: 10px;
+    width: 85%;
+}
+.log-register-user input {
+    width: 100%;
+    padding: 5px 10px;
+    font-size: 10px;
+    border: 2px solid #aaa;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+.log-register-user a {
+    font-size: 7px;
+    color: #444;
+    text-decoration: none;
+}
+
+.log-register-user a:hover {
+    color: #000;
 }
 
 h1 {
@@ -106,3 +156,154 @@ h1 {
   .movie-poster:hover {
       transform: scale(1.1);
   }
+
+  /* movie site */
+  .movie-form-page {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border: 30px;
+}
+
+.slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 400px;
+    width: 300px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.slide p {
+    font-size: 10px;
+    margin: 3px;
+}
+
+.slide a {
+    text-decoration: none;
+    color: #333;
+    margin: 10px;
+    font-size: 10px;
+}
+
+.slide a:hover {
+    color: #000;
+}
+
+#poster-container {
+    background-color: #98ac92;
+    /* opacity: 0.8; */
+}
+
+#review-container {
+    background-color: white;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* opacity: 0.8; */
+
+
+}
+.editable-field {
+    margin: 10px;
+
+}
+.poster {
+    margin: 10px;
+} 
+
+h2, h3 {
+    font-size: 10px;
+    margin: 5px; 
+}
+
+h3 {
+    color: #98ac92;
+}
+
+button {
+    border-radius: 15px;
+    border: 1px;
+    box-shadow: inset 0 0 3px rgba(3, 3, 3, 0.9);
+    color:  #e8eae2;
+    background-color: #333333;
+    font-size: 12px;
+}
+
+.loop {
+    border-radius: 30px;
+}
+
+.slide button {
+    padding: 3px;
+    /* margin: 5px 0; */
+    margin: 0 auto;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    font-size: 6px;
+}
+
+button:hover {
+    background-color: #e8eae2;
+    color: #333333;
+}
+
+#review-section {
+    text-align: center;
+    overflow-wrap: break-word;
+    position: relative;
+}
+
+textarea {
+    width: 200px;
+    height: 150px;
+}
+
+#current-review, #current-rating, textarea {
+    font-size: 8px;
+}
+
+#current-review {
+    max-height: 200px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    background-color:  #98ac92;
+    color: black;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    /* Position the tooltip */
+    top: 0%;
+    left: 0%;
+    bottom: 10%;
+    /* transform: translateX(-50%); */
+    z-index: 1;
+    font-size: 8px;
+}
+
+#current-review:hover .tooltip {
+    visibility: visible;
+}

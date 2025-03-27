@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class User(db.Model):
+    """
+    Class responsible for creating a user with their individual attributes
+    """
 
     __tablename__ = 'users'
 
@@ -16,6 +19,9 @@ class User(db.Model):
     
 
 class Movie(db.Model):
+    """
+    Class responsible for creating a movie with its individual attributes
+    """
 
     __tablename__ = 'movies'
 
@@ -30,7 +36,13 @@ class Movie(db.Model):
     def __repr__(self):
         return f'"{self.title} ({self.year}) directed by {self.director}. Rating: {self.rating}"'
 
+
 class UserMovies(db.Model):
+    """
+    Class responsible for creating a movie-user relationship.
+    Based on this relationship movies are fetched from movies table
+    for the specific user
+    """
 
     __tablename__ = 'user_movies'
 
