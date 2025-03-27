@@ -6,8 +6,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
-from data_models import db, User, Movie, UserMovies
-from sql_data_manager import SQLiteDataManager
+from datamanager.data_models import db, User, Movie, UserMovies
+from datamanager.sql_data_manager import SQLiteDataManager
 import helper
 from helper import login_required
 

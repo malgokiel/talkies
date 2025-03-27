@@ -1,6 +1,6 @@
 from sqlalchemy.exc import OperationalError
-from data_models import Movie, User, UserMovies 
-from interface import DataManagerInterface
+from datamanager.data_models import Movie, User, UserMovies 
+from datamanager.interface import DataManagerInterface
 
 class SQLiteDataManager(DataManagerInterface):
     """
