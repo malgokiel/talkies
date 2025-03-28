@@ -2,6 +2,13 @@
 
 {% block main %}
     <h1>The Talkies</h1>
+    <div class="message-display">
+        {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+    </div>
     <form action="/" method="post" class="index-form">
         <div>
             <input name="title" placeholder="title">

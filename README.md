@@ -54,5 +54,8 @@ Here you can see all the information about the talkie and manage it: delete the 
 Once you are done enjoying the page, log yourself out.
 See you next time! Your movies will be waiting for you.
 
+## SQL schema
+If you would like to set up your own database, here is the refernece table:
+![schema.png](static/images/schema.png)
 
 

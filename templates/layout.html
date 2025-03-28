@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Talkies</title>
+    <!-- https://favicon.io/emoji-favicons/film-projector/ -->
+    <link href="/static/favicon.ico" rel="icon">
     <link href="/static/styles.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -18,21 +20,9 @@
         <a class="right-menu" href="/register">Create an account</a>
         {% endif %}
     </nav>
-    <div class="message-display">
-        {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-        {% endif %}
-    </div>
     <main>
         {% block main %}{% endblock %}
     </main>
-    <script>
-        function deleteMovie(movie_id){
-            fetch(`/movie/delete/${movie_id}`);
-            window.location.href = "/";
-        }
-    </script>
+    <script src="/static/script.js"></script>
 </body>
 </html>

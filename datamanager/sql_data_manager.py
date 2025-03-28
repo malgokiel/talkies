@@ -2,6 +2,8 @@ from sqlalchemy.exc import OperationalError
 from datamanager.data_models import Movie, User, UserMovies 
 from datamanager.interface import DataManagerInterface
 
+DB_CONN_ERROR = ["An error occured when quering DB. Please contact your administrator."]
+
 class SQLiteDataManager(DataManagerInterface):
     """
     CLass responsible for reading the data source 
@@ -20,7 +22,7 @@ class SQLiteDataManager(DataManagerInterface):
             return users
         except OperationalError as e:
             print(e)
-            return ["An error occured when quering DB. Please contact your administrator."]
+            return DB_CONN_ERROR
 
 
     def get_all_movies(self):
@@ -30,11 +32,15 @@ class SQLiteDataManager(DataManagerInterface):
         movies = self.db.session.query(Movie).all()
         return movies
 
-    def get_matching_user(self, user_login):
 
+    def get_matching_user(self, user_login):
+        """
+        Returns a user object matching specified login
+        """
         matching_user = self.db.session.query(User).filter(User.login==user_login).all()
         return matching_user
     
+
     def get_matching_movies(self, find_match, user_id):
         """
         Returns a list of all movies in the user's library 
@@ -55,13 +61,25 @@ class SQLiteDataManager(DataManagerInterface):
         to their library
         """
         try:
-            users_movies = self.db.session.query(UserMovies).filter(UserMovies.user_id==user_id).all()
+            users_movies = self.db.session.query(UserMovies).filter(
+                UserMovies.user_id==user_id).all()
             ids = [UserMovies.movie_id for UserMovies in users_movies]
             movies = self.db.session.query(Movie).filter(Movie.id.in_(ids)).all()
             return movies
         except OperationalError as e:
             print(e)
-            return ["An error occured when quering DB. Please contact your administrator."]
+            return DB_CONN_ERROR
+
+
+    def get_movie(self, id_type, id):
+        """
+        Returns a movie from an exsiting movie based on its individual imdbid or id
+        """
+        try:
+            movie = self.db.session.query(Movie).filter(getattr(Movie, id_type)==id).first()
+            return movie
+        except ConnectionError:
+            return DB_CONN_ERROR
 
 
     def add_user(self, user):
@@ -83,18 +101,26 @@ class SQLiteDataManager(DataManagerInterface):
         """
         Commits a new/updated user's review to DB
         """
-        user_movie = self.db.session.query(UserMovies).filter(UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
-        user_movie.user_review = review
-        self.db.session.commit()
+        try:
+            user_movie = self.db.session.query(UserMovies).filter(
+                UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
+            user_movie.user_review = review
+            self.db.session.commit()
+        except ConnectionError:
+            return DB_CONN_ERROR
 
 
     def manage_user_rating(self,user_id, movie_id, rating):
         """
         Commits a new/updated user's rating to DB
         """
-        user_movie = self.db.session.query(UserMovies).filter(UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
-        user_movie.user_rating = rating
-        self.db.session.commit()
+        try:
+            user_movie = self.db.session.query(UserMovies).filter(
+                UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
+            user_movie.user_rating = rating
+            self.db.session.commit()
+        except ConnectionError:
+            return DB_CONN_ERROR
 
 
     def add_user_movie(self, user_id, movie_id):
@@ -112,10 +138,14 @@ class SQLiteDataManager(DataManagerInterface):
         """
         Deletes a user-movie relationshop from DB based on their ids
         """
-        user_movie = self.db.session.query(UserMovies).filter(UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
-        self.db.session.delete(user_movie)
-        self.db.session.commit()
-        return "Movie deleted"
+        try:
+            user_movie = self.db.session.query(UserMovies).filter(
+                UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
+            self.db.session.delete(user_movie)
+            self.db.session.commit()
+            return ["Movie deleted"]
+        except ConnectionError:
+            return DB_CONN_ERROR
     
 
     def _add_to_db(self, new_item):
@@ -127,7 +157,6 @@ class SQLiteDataManager(DataManagerInterface):
             self.db.session.commit()
             return ["Successfully added."]
         except ConnectionError:
-            return ["Database connection error occurred. "
-            "If the problem persist, contact your administrator."]
+            return DB_CONN_ERROR
 
 

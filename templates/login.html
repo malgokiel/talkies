@@ -1,12 +1,19 @@
 {% extends 'layout.html' %}
 
 {% block main %}
+<div class="message-display">
+    {% if messages %}
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+</div>
 <main>
 <div class="log-register-user">
     <form action="/login" method="post">
         <label>Login:</label>
         <input type="text" placeholder="John123" name="login_id">
-        <label>Passwords:</label>
+        <label>Password:</label>
         <input type="text" name="password">
         <button type="submit" name="login" value="login_user">log me in</button>
     </form>
