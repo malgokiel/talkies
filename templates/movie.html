@@ -16,7 +16,7 @@
             <p>{{ movie.rating }}/10 &#11088;</p>
             <p>Directed by: {{ movie.director }}</p>
             <p>{{ movie.year }}</p>
-            <a href="https://www.imdb.com/title/{{ movie.imdb_id }}/">imDB page</a>
+            <a target="_blank" href="https://www.imdb.com/title/{{ movie.imdb_id }}/">imDB page</a>
             <button name="delete" value="{{ movie.id }}" type="submit" onclick=deleteMovie(value)>delete movie</button>
         </div>
         <div class="slide" id="review-container" data-movie-id="{{ movie.id }}">

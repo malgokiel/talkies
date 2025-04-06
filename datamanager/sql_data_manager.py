@@ -37,7 +37,7 @@ class SQLiteDataManager(DataManagerInterface):
         """
         Returns a user object matching specified login
         """
-        matching_user = self.db.session.query(User).filter(User.login==user_login).all()
+        matching_user = self.db.session.query(User).filter(User.login==user_login).first()
         return matching_user
     
 

@@ -6,19 +6,17 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
-from datamanager.data_models import db, User, Movie, UserMovies
+from datamanager.data_models import db, User, UserMovies
 from datamanager.sql_data_manager import SQLiteDataManager
 import helper
 from helper import login_required
-
-DEFAULT_POSTER = "https://ibb.co/393BTpF5"
 
 # Set the app up and establish db connection
 current_directory = os.getcwd()
 database_path = os.path.join(current_directory, 'data', 'talkies.sqlite')
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:////{database_path}'
-db = SQLAlchemy(app)
+db = SQLAlchemy(app) 
 manager = SQLiteDataManager(db)
 
 # Configure session to use filesystem (instead of signed cookies)
@@ -96,27 +94,8 @@ def index():
             is_success, movie_json = helper.get_movie_from_api(title_to_search)
             if is_success:
                 if movie_json["Response"] == 'True' and movie_json["Type"] != "series":
-                    title = movie_json["Title"]
-                    director = movie_json["Director"]
-                    year = movie_json["Year"] if movie_json["Year"] != "N/A" else 0
-                    rating = movie_json["imdbRating"] if movie_json["imdbRating"] != "N/A" else 0
-                    poster_url = movie_json["Poster"] if movie_json["Poster"] != "N/A" else DEFAULT_POSTER
-                    imdb_id = movie_json["imdbID"]
+                    movie_id = helper.get_new_or_existing_movie_id(movie_json, manager, all_movies)
                     
-                    # if it's a new movie adds it to the table, else
-                    # just gets it's existing id
-                    if helper.is_new_movie(imdb_id, all_movies):
-                        new_movie = Movie(title=title,
-                                        director=director,
-                                        year=year,
-                                        rating=rating,
-                                        poster_url=poster_url,
-                                        imdb_id=imdb_id)
-                        movie_id = manager.add_movie(new_movie)
-                    else:
-                        movie_id = manager.get_movie("imdb_id", imdb_id).id
-
-                    # adds new user movie relationship if it does not yet exist
                     try:
                         manager.add_user_movie(session["user_id"], movie_id)
                     except IntegrityError:  
@@ -177,6 +156,8 @@ def user_rating():
     rating = data.get('rating')
     try:
         rating = float(rating)
+        if rating < 1 or rating > 10:
+            return jsonify({'message': 'Rating must be between 1 and 10'}), 400
     except ValueError:
         return jsonify({'message': 'Rating is not a number'}), 400
     
@@ -211,10 +192,10 @@ def login_user():
             password = request.form.get('password')
             matching_user = manager.get_matching_user(user_login)
             if matching_user:
-                user_hash = [user.hash for user in matching_user]
-                user_id = [user.id for user in matching_user]
-                if check_password_hash(user_hash[0], password):
-                    session['user_id'] = user_id[0]
+                user_hash = matching_user.hash
+                user_id = matching_user.id
+                if check_password_hash(user_hash, password):
+                    session['user_id'] = user_id
                     session['username'] = user_login
                     return redirect('/')
             else:

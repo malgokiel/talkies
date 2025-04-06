@@ -1,19 +1,14 @@
-function deleteMovie(movie_id){
-    fetch(`/movie/delete/${movie_id}`);
-    window.location.href = "/";
+async function deleteMovie(movie_id){
+    if (confirm("Are you sure you want to delete this movie?") == true) {
+        await fetch(`/movie/delete/${movie_id}`);
+        window.location.href = "/";
+    }
 }
 
 // below section was created with help of Gemini - google AI tool
 document.addEventListener('DOMContentLoaded', () => {
     // Getting all the elements from HTML
     const reviewContainer = document.getElementById("review-container");
-    const currentRating = document.getElementById("current-rating");
-    const currentReview = document.getElementById("current-review");
-    const editButton = document.getElementById("edit-button");
-    const saveButton = document.getElementById("save-button");
-    const editFields = document.getElementById("edit-fields");
-    const editRatingInput = document.getElementById("edit-rating-input");
-    const editReviewTextarea = document.getElementById("edit-review-textarea");
     const movieId = reviewContainer.dataset.movieId;
 
     // User clicked 'edit' button and now:
