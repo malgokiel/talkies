@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request, render_template, redirect, session
+from flask import abort, Flask, jsonify, request, render_template, redirect, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -137,6 +137,9 @@ def movie_details(movie_id):
     Displays information about the queried movie.
     """
     movie = manager.get_movie("id", movie_id)
+    if movie == None:
+        abort(404)
+
     user_movie = db.session.query(UserMovies).filter(
         UserMovies.user_id==session['user_id'], 
         UserMovies.movie_id==movie_id).first()

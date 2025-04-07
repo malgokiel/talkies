@@ -1,4 +1,4 @@
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import SQLAlchemyError
 from datamanager.data_models import Movie, User, UserMovies 
 from datamanager.interface import DataManagerInterface
 
@@ -20,7 +20,7 @@ class SQLiteDataManager(DataManagerInterface):
         try:
             users = self.db.session.query(User).all()
             return users
-        except OperationalError as e:
+        except SQLAlchemyError as e:
             print(e)
             return DB_CONN_ERROR
 
@@ -61,12 +61,13 @@ class SQLiteDataManager(DataManagerInterface):
         to their library
         """
         try:
-            users_movies = self.db.session.query(UserMovies).filter(
-                UserMovies.user_id==user_id).all()
-            ids = [UserMovies.movie_id for UserMovies in users_movies]
-            movies = self.db.session.query(Movie).filter(Movie.id.in_(ids)).all()
+            movies = self.db.session.query(Movie).join(UserMovies, Movie.id == UserMovies.movie_id).filter(UserMovies.user_id==user_id).all()
+            # users_movies = self.db.session.query(UserMovies).filter(
+            #     UserMovies.user_id==user_id).all()
+            # ids = [UserMovies.movie_id for UserMovies in users_movies]
+            # movies = self.db.session.query(Movie).filter(Movie.id.in_(ids)).all()
             return movies
-        except OperationalError as e:
+        except SQLAlchemyError as e:
             print(e)
             return DB_CONN_ERROR
 
@@ -78,7 +79,9 @@ class SQLiteDataManager(DataManagerInterface):
         try:
             movie = self.db.session.query(Movie).filter(getattr(Movie, id_type)==id).first()
             return movie
-        except ConnectionError:
+        except AttributeError:
+            return [f"No matching movie found for {id_type}: {id}."]
+        except SQLAlchemyError:
             return DB_CONN_ERROR
 
 
@@ -106,7 +109,7 @@ class SQLiteDataManager(DataManagerInterface):
                 UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
             user_movie.user_review = review
             self.db.session.commit()
-        except ConnectionError:
+        except SQLAlchemyError:
             return DB_CONN_ERROR
 
 
@@ -119,7 +122,7 @@ class SQLiteDataManager(DataManagerInterface):
                 UserMovies.user_id==user_id, UserMovies.movie_id==movie_id).first()
             user_movie.user_rating = rating
             self.db.session.commit()
-        except ConnectionError:
+        except SQLAlchemyError:
             return DB_CONN_ERROR
 
 
@@ -144,7 +147,7 @@ class SQLiteDataManager(DataManagerInterface):
             self.db.session.delete(user_movie)
             self.db.session.commit()
             return ["Movie deleted"]
-        except ConnectionError:
+        except SQLAlchemyError:
             return DB_CONN_ERROR
     
 
@@ -156,7 +159,7 @@ class SQLiteDataManager(DataManagerInterface):
             self.db.session.add(new_item)
             self.db.session.commit()
             return ["Successfully added."]
-        except ConnectionError:
+        except SQLAlchemyError:
             return DB_CONN_ERROR
 
 
